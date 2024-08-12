@@ -3,6 +3,7 @@ import 'dotenv/config';
 export default () => ({
   app: {
     name: process.env.APP_NAME,
+    cors: process.env.APP_CORS === 'true' || false,
   },
   database: {
     host: process.env.DATABASE_HOST,
