@@ -6,6 +6,10 @@ export default () => ({
     port: parseInt(process.env.APP_PORT, 10) || 3000,
     cors: process.env.APP_CORS === 'true' || false,
   },
+  auth: {
+    secret: process.env.AUTH_SECRET,
+    expiresIn: process.env.AUTH_EXPIRESIN,
+  },
   database: {
     host: process.env.DATABASE_HOST,
     port: parseInt(process.env.DATABASE_PORT, 10) || 3306,
