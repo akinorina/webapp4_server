@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { LogoutputsModule } from './logoutputs/logoutputs.module';
+import { SampleLogsModule } from './sample_logs/sample_logs.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 
@@ -10,7 +10,7 @@ import configuration from './config/configuration';
   imports: [
     ConfigModule.forRoot({ load: [configuration] }),
     UsersModule,
-    LogoutputsModule,
+    SampleLogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
