@@ -1,11 +1,11 @@
 import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { console, application } from '../log/logger';
 
-@Controller('logoutputs')
-export class LogoutputsController {
+@Controller('sample_logs')
+export class SampleLogsController {
   @Get()
   app() {
-    console.debug('GET /api/logoutputs on console.');
+    console.debug('GET /api/sample_logs on console.');
     application.debug('logs', 'ログ出力');
     application.debug('logs1', 'ログ1出力');
     return 'applicationLog - ログ出力';
@@ -13,7 +13,7 @@ export class LogoutputsController {
 
   @Get('fatal')
   fatal() {
-    console.fatal('GET /api/logoutputs/fatal on console.');
+    console.fatal('GET /api/sample_logs/fatal on console.');
     application.fatal('logs', 'fatal ログ出力');
     application.fatal('logs1', 'fatal ログ1出力');
     return 'applicationLog - fatal ログ出力';
@@ -21,7 +21,7 @@ export class LogoutputsController {
 
   @Get('error')
   error() {
-    console.error('GET /api/logoutputs/error on console.');
+    console.error('GET /api/sample_logs/error on console.');
     application.error('logs', 'error ログ出力');
     application.error('logs1', 'error ログ1出力');
     application.error('logs2', 'error ログ2出力');
@@ -30,7 +30,7 @@ export class LogoutputsController {
 
   @Get('warn')
   warn() {
-    console.warn('GET /api/logoutputs/warn on console.');
+    console.warn('GET /api/sample_logs/warn on console.');
     application.warn('logs', 'warn ログ出力');
     application.warn('logs2', 'warn ログ2出力');
     return 'applicationLog - warn ログ出力';
@@ -38,7 +38,7 @@ export class LogoutputsController {
 
   @Get('info')
   info() {
-    console.info('GET /api/logoutputs/info on console.');
+    console.info('GET /api/sample_logs/info on console.');
     application.info('logs', 'info ログ出力');
     application.info('logs2', 'info ログ2出力');
     return 'applicationLog - info ログ出力';
@@ -46,7 +46,7 @@ export class LogoutputsController {
 
   @Get('debug')
   debug() {
-    console.debug('GET /api/logoutputs/debug on console.');
+    console.debug('GET /api/sample_logs/debug on console.');
     application.debug('logs', 'debug ログ出力');
     application.debug('logs2', 'debug ログ2出力');
     return 'applicationLog - debug ログ出力';
@@ -54,7 +54,7 @@ export class LogoutputsController {
 
   @Get('trace')
   trace() {
-    console.trace('GET /api/logoutputs/trace on console.');
+    console.trace('GET /api/sample_logs/trace on console.');
     application.trace('logs', 'trace ログ出力');
     application.trace('logs2', 'trace ログ2出力');
     return 'applicationLog - trace ログ出力';
