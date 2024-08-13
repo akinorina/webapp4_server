@@ -16,6 +16,9 @@ export class User {
   @PrimaryGeneratedColumn({ comment: 'ID' })
   id: number = 0;
 
+  @Column({ default: '', comment: 'ユーザー名' })
+  username: string = '';
+
   @Column({ default: '', comment: '姓' })
   familyname: string = '';
 
