@@ -9,15 +9,15 @@ export class AuthController {
 
   @Public()
   @UseGuards(LocalAuthGuard)
-  @Post('login')
-  async login(@Request() req: any) {
-    return this.authService.login(req.user);
+  @Post('signin')
+  async signIn(@Request() req: any) {
+    return this.authService.signIn(req.user);
   }
 
   @Public()
-  @Post('logout')
-  async logout() {
-    return this.authService.logout();
+  @Post('signout')
+  async signOut() {
+    return this.authService.signOut();
   }
 
   @Get('profile')
