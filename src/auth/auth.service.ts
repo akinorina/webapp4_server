@@ -19,14 +19,14 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
+  async signIn(user: any) {
     const payload = { username: user.username, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async logout() {
+  async signOut() {
     return { access_token: null };
   }
 }
