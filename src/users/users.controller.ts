@@ -6,13 +6,15 @@ import {
   Param,
   Delete,
   Put,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from 'src/roles/roles.decorator';
-import { ERule } from 'src/roles/roles.enum';
+import { ERoles } from 'src/roles/roles.enum';
 
 @Controller('users')
 export class UsersController {
@@ -24,25 +26,31 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Roles([ERule.Admin])
+  @Roles([ERoles.Admin])
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
-  @Roles([ERule.Admin])
+  @Roles([ERoles.Admin])
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
 
-  @Roles([ERule.Admin])
+  @Roles([ERoles.Admin, ERoles.User])
+  @Put('change-password')
+  changePassword(@Request() req, @Body() changePasswordDto: ChangePasswordDto) {
+    return this.usersService.changePassword(req.user, changePasswordDto);
+  }
+
+  @Roles([ERoles.Admin])
   @Put(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @Roles([ERule.Admin])
+  @Roles([ERoles.Admin])
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);

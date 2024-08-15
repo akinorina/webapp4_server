@@ -1,10 +1,11 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Role } from 'src/roles/entities/role.entity';
-import { ERule } from 'src/roles/roles.enum';
+import { ERoles } from 'src/roles/roles.enum';
 
 @Injectable()
 export class UsersService {
@@ -21,7 +22,7 @@ export class UsersService {
 
     // set Role as 'user'
     const role = await this.roleRepository.findOne({
-      where: { name: ERule.User },
+      where: { name: ERoles.User },
     });
     newUser.roles = [role];
 
@@ -61,5 +62,25 @@ export class UsersService {
 
   async remove(id: number) {
     return await this.userRepository.softDelete(id);
+  }
+
+  async changePassword(user: any, changePasswordDto: ChangePasswordDto) {
+    // find the target User data.
+    const targetUser = await this.userRepository.findOne({
+      where: {
+        id: user.id,
+        username: user.username,
+        password: changePasswordDto.oldPassword,
+      },
+    });
+
+    // 該当データなしの場合はERROR
+    if (!targetUser) {
+      throw new HttpException('no user.', HttpStatus.BAD_REQUEST);
+    }
+
+    // change password
+    targetUser.password = changePasswordDto.newPassword;
+    return await this.userRepository.update(user.id, targetUser);
   }
 }
