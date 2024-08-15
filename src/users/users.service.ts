@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Role } from 'src/roles/entities/role.entity';
-import { ERule } from 'src/roles/roles.enum';
+import { ERoles } from 'src/roles/roles.enum';
 
 @Injectable()
 export class UsersService {
@@ -21,7 +21,7 @@ export class UsersService {
 
     // set Role as 'user'
     const role = await this.roleRepository.findOne({
-      where: { name: ERule.User },
+      where: { name: ERoles.User },
     });
     newUser.roles = [role];
 
