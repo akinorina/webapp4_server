@@ -2,7 +2,6 @@ import * as path from 'path';
 
 // ログ出力先は、サーバー内の絶対パスを動的に取得して出力先を設定したい
 const APP_ROOT = path.join(__dirname, '../../');
-console.log('APP_ROOT', APP_ROOT);
 
 // ログ出力設定
 // log4jsはルートロガーで使用するので、エクスポートに変更
