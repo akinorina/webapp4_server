@@ -6,10 +6,12 @@ import {
   Param,
   Delete,
   Put,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from 'src/roles/roles.decorator';
 import { ERoles } from 'src/roles/roles.enum';
@@ -34,6 +36,12 @@ export class UsersController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
+  }
+
+  @Roles([ERoles.Admin, ERoles.User])
+  @Put('change-password')
+  changePassword(@Request() req, @Body() changePasswordDto: ChangePasswordDto) {
+    return this.usersService.changePassword(req.user, changePasswordDto);
   }
 
   @Roles([ERoles.Admin])
