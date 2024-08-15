@@ -9,7 +9,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
+import { Role } from '../../roles/entities/role.entity';
+import { CreateUserDto } from '../dto/create-user.dto';
 
 @Entity()
 export class User {
@@ -37,6 +41,10 @@ export class User {
   @Column({ default: '', comment: 'パスワード' })
   password: string = '';
 
+  @ManyToMany(() => Role)
+  @JoinTable()
+  roles: Role[];
+
   @CreateDateColumn({ comment: '作成日時' })
   createdAt: string | undefined = undefined;
 
@@ -45,4 +53,14 @@ export class User {
 
   @DeleteDateColumn({ comment: '削除日時' })
   deletedAt: string | undefined = undefined;
+
+  setValueByCreateUserDto(createUserDto: CreateUserDto) {
+    this.username = createUserDto.username;
+    this.firstname = createUserDto.firstname;
+    this.familyname = createUserDto.familyname;
+    this.firstnameKana = createUserDto.firstnameKana;
+    this.familynameKana = createUserDto.familynameKana;
+    this.email = createUserDto.email;
+    this.password = createUserDto.password;
+  }
 }
