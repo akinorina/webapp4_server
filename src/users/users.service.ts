@@ -2,7 +2,7 @@ import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { Repository } from 'typeorm';
+import { Repository, QueryFailedError } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { ERoles } from 'src/roles/roles.enum';
@@ -17,16 +17,24 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const newUser = new User();
-    newUser.setValueByCreateUserDto(createUserDto);
+    try {
+      const newUser = new User();
+      newUser.setValueByCreateUserDto(createUserDto);
 
-    // set Role as 'user'
-    const role = await this.roleRepository.findOne({
-      where: { name: ERoles.User },
-    });
-    newUser.roles = [role];
+      // set Role as 'user'
+      const role = await this.roleRepository.findOne({
+        where: { name: ERoles.User },
+      });
+      newUser.roles = [role];
 
-    return await this.userRepository.save(newUser);
+      return await this.userRepository.save(newUser);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      } else {
+        throw error;
+      }
+    }
   }
 
   async findAll() {
@@ -46,6 +54,21 @@ export class UsersService {
       return await this.userRepository.findOne({
         where: {
           username: username,
+        },
+        relations: {
+          roles: true,
+        },
+      });
+    } catch (err) {
+      throw new HttpException('not found.', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async findOneByEmail(email: string) {
+    try {
+      return await this.userRepository.findOne({
+        where: {
+          email: email,
         },
         relations: {
           roles: true,
