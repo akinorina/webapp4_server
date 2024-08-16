@@ -13,11 +13,9 @@ export class CreateUserDto {
   @Length(1, 10)
   firstname: string;
 
-  @IsNotEmpty()
   @Length(1, 50)
   familynameKana: string;
 
-  @IsNotEmpty()
   @Length(1, 50)
   firstnameKana: string;
 
