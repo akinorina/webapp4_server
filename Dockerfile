@@ -14,9 +14,12 @@ COPY .env.development.local .env
 RUN npm run build
 
 # 実行環境
-FROM node:22.6.0-bullseye-slim
+FROM node:22.6.0-bullseye-slim AS production
 ENV NODE_ENV=production
 WORKDIR /app
+
+## install curl for healthcheck
+RUN apt-get update && apt-get install curl -y
 
 ## ビルド環境からビルド済みのファイル等をコピーし、当該フォルダのオーナーをnodeユーザーへ変更
 COPY --from=builder --chown=node:node /app/ /app/ 
