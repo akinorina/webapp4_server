@@ -9,6 +9,12 @@ export default () => ({
   auth: {
     secret: process.env.AUTH_SECRET,
     expiresIn: process.env.AUTH_EXPIRESIN,
+    google_oauth: {
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirectUrl: process.env.GOOGLE_REDIRECT_URL,
+      scope: ['email', 'profile'],
+    },
   },
   database: {
     host: process.env.DATABASE_HOST,
