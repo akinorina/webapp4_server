@@ -2,7 +2,7 @@ import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { Repository, QueryFailedError } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { ERoles } from 'src/roles/roles.enum';
@@ -17,24 +17,16 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    try {
-      const newUser = new User();
-      newUser.setValueByCreateUserDto(createUserDto);
+    const newUser = new User();
+    newUser.setValueByCreateUserDto(createUserDto);
 
-      // set Role as 'user'
-      const role = await this.roleRepository.findOne({
-        where: { name: ERoles.User },
-      });
-      newUser.roles = [role];
+    // set Role as 'user'
+    const role = await this.roleRepository.findOne({
+      where: { name: ERoles.User },
+    });
+    newUser.roles = [role];
 
-      return await this.userRepository.save(newUser);
-    } catch (error) {
-      if (error instanceof QueryFailedError) {
-        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-      } else {
-        throw error;
-      }
-    }
+    return await this.userRepository.save(newUser);
   }
 
   async findAll() {
