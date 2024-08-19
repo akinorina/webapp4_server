@@ -9,7 +9,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
 } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Image {
@@ -27,6 +29,9 @@ export class Image {
 
   @Column({ default: '', comment: 'PATH' })
   path: string = '';
+
+  @ManyToOne(() => User, (user) => user.images)
+  user: User;
 
   @CreateDateColumn({ comment: '作成日時' })
   createdAt: string | undefined = undefined;

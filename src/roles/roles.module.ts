@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { DatabaseModule } from 'src/database/database.module';
 import { roleProviders } from './entities/role.providers';
 import { RolesService } from './roles.service';
-import { DatabaseModule } from 'src/database/database.module';
-import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './roles.guard';
 
 @Module({
@@ -15,6 +15,5 @@ import { RolesGuard } from './roles.guard';
       useClass: RolesGuard,
     },
   ],
-  exports: [RolesService],
 })
 export class RolesModule {}

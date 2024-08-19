@@ -8,6 +8,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Put,
+  Request,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -23,8 +24,8 @@ export class ImagesController {
 
   @Roles([ERoles.User])
   @Post()
-  create(@Body() createImageDto: CreateImageDto) {
-    return this.imagesService.create(createImageDto);
+  create(@Request() req, @Body() createImageDto: CreateImageDto) {
+    return this.imagesService.create(req.user, createImageDto);
   }
 
   @Roles([ERoles.User])
@@ -59,11 +60,5 @@ export class ImagesController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.imagesService.remove(+id);
-  }
-
-  @Roles([ERoles.User])
-  @Post('list-s3')
-  listS3() {
-    return this.imagesService.listS3();
   }
 }

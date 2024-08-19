@@ -14,7 +14,7 @@ import * as fs from 'fs';
 import * as path from 'node:path';
 import * as dayjs from 'dayjs';
 import configuration from 'src/config/configuration';
-import { console } from 'src/log/logger';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ImagesService {
@@ -34,10 +34,11 @@ export class ImagesService {
   constructor(
     @Inject('IMAGE_REPOSITORY')
     private imageRepository: Repository<Image>,
+    @Inject('USER_REPOSITORY')
+    private userRepository: Repository<User>,
   ) {}
 
-  async create(createImageDto: CreateImageDto) {
-    console.debug('--- create() ---');
+  async create(user: any, createImageDto: CreateImageDto) {
     const fileName =
       path.parse(createImageDto.originalname).name +
       dayjs().format('_YYYYMMDDHHmmss') +
@@ -59,12 +60,18 @@ export class ImagesService {
     });
     await this.s3client.send(command);
 
+    // User
+    const targetUser = await this.userRepository.findOneByOrFail({
+      id: user.id,
+    });
+
     // DBへデータ登録
     const imageData = {
       name: createImageDto.name,
       bucket: this.bucketName,
       objectKey: objectKey,
       path: imagePath,
+      user: targetUser,
     };
     return await this.imageRepository.save(imageData);
   }
@@ -102,7 +109,6 @@ export class ImagesService {
   }
 
   async findAll() {
-    console.debug('--- findAll() ---');
     return await this.imageRepository.find();
   }
 
@@ -136,15 +142,5 @@ export class ImagesService {
     }
     // softdelete the target DB data.
     return this.imageRepository.softDelete(id);
-  }
-
-  async listS3() {
-    // list objects
-    const command = new ListObjectsV2Command({
-      Bucket: 'webapp4',
-    });
-    const result = await this.s3client.send(command);
-    // console.log(result);
-    return result.Contents;
   }
 }
