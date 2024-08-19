@@ -6,7 +6,6 @@ import { Image } from './entities/image.entity';
 import {
   S3Client,
   S3ClientConfig,
-  ListObjectsV2Command,
   PutObjectCommand,
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
@@ -38,7 +37,12 @@ export class ImagesService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(user: any, createImageDto: CreateImageDto) {
+  async create(req: any, createImageDto: CreateImageDto) {
+    // User
+    const targetUser = await this.userRepository.findOneByOrFail({
+      id: req.user.id,
+    });
+
     const fileName =
       path.parse(createImageDto.originalname).name +
       dayjs().format('_YYYYMMDDHHmmss') +
@@ -60,11 +64,6 @@ export class ImagesService {
     });
     await this.s3client.send(command);
 
-    // User
-    const targetUser = await this.userRepository.findOneByOrFail({
-      id: user.id,
-    });
-
     // DBへデータ登録
     const imageData = {
       name: createImageDto.name,
@@ -76,7 +75,16 @@ export class ImagesService {
     return await this.imageRepository.save(imageData);
   }
 
-  async upload(createImageDto: CreateImageDto, file: Express.Multer.File) {
+  async upload(
+    req: any,
+    createImageDto: CreateImageDto,
+    file: Express.Multer.File,
+  ) {
+    // User
+    const targetUser = await this.userRepository.findOneByOrFail({
+      id: req.user.id,
+    });
+
     const fileName =
       path.parse(file.originalname).name +
       dayjs().format('_YYYYMMDDHHmmss') +
@@ -101,22 +109,49 @@ export class ImagesService {
       readStream.close();
 
       // DBへデータ登録
-      createImageDto.bucket = this.bucketName;
-      createImageDto.objectKey = objectKey;
-      createImageDto.path = imagePath;
-      return await this.imageRepository.save(createImageDto);
+      const imageData = {
+        name: createImageDto.name,
+        bucket: this.bucketName,
+        objectKey: objectKey,
+        path: imagePath,
+        user: targetUser,
+      };
+      return await this.imageRepository.save(imageData);
     }
   }
 
-  async findAll() {
-    return await this.imageRepository.find();
+  async findAll(req: any) {
+    return await this.imageRepository.find({
+      relations: {
+        user: true,
+      },
+      where: {
+        user: {
+          id: req.user.id,
+        },
+      },
+    });
   }
 
-  async findOne(id: number) {
-    return await this.imageRepository.findOneByOrFail({ id: id });
+  async findOne(req: any, id: number) {
+    return await this.imageRepository.findOneOrFail({
+      relations: {
+        user: true,
+      },
+      where: {
+        id: id,
+        user: { id: req.user.id },
+      },
+    });
   }
 
-  async update(id: number, updateImageDto: UpdateImageDto) {
+  async update(req: any, id: number, updateImageDto: UpdateImageDto) {
+    // User
+    const targetUser = await this.userRepository.findOneByOrFail({
+      id: req.user.id,
+    });
+
+    // Image
     const imageData = await this.imageRepository.findOneByOrFail({ id: id });
 
     // update the target DB data.
@@ -126,6 +161,7 @@ export class ImagesService {
       bucket: imageData.bucket,
       objectKey: imageData.objectKey,
       path: imageData.path,
+      user: targetUser,
     };
     return this.imageRepository.update(id, updateData);
   }

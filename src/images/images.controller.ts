@@ -25,35 +25,40 @@ export class ImagesController {
   @Roles([ERoles.User])
   @Post()
   create(@Request() req, @Body() createImageDto: CreateImageDto) {
-    return this.imagesService.create(req.user, createImageDto);
+    return this.imagesService.create(req, createImageDto);
   }
 
   @Roles([ERoles.User])
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', { dest: 'uploads/' }))
   upload(
+    @Request() req,
     @Body() createImageDto: CreateImageDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.imagesService.upload(createImageDto, file);
+    return this.imagesService.upload(req, createImageDto, file);
   }
 
   @Roles([ERoles.User])
   @Get()
-  findAll() {
-    return this.imagesService.findAll();
+  findAll(@Request() req) {
+    return this.imagesService.findAll(req);
   }
 
   @Roles([ERoles.User])
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.imagesService.findOne(+id);
+  findOne(@Request() req, @Param('id') id: string) {
+    return this.imagesService.findOne(req, +id);
   }
 
   @Roles([ERoles.User])
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateImageDto: UpdateImageDto) {
-    return this.imagesService.update(+id, updateImageDto);
+  update(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() updateImageDto: UpdateImageDto,
+  ) {
+    return this.imagesService.update(req, +id, updateImageDto);
   }
 
   @Roles([ERoles.User])
