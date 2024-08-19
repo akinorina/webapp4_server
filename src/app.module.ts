@@ -5,7 +5,7 @@ import { UsersModule } from './users/users.module';
 import { SampleLogsModule } from './sample_logs/sample_logs.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { RolesModule } from './roles/roles.module';
+import { ImagesModule } from './images/images.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -14,7 +14,7 @@ import configuration from './config/configuration';
     UsersModule,
     SampleLogsModule,
     AuthModule,
-    RolesModule,
+    ImagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
