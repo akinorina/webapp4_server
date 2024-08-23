@@ -5,7 +5,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Role } from 'src/roles/entities/role.entity';
-import { ERoles } from 'src/roles/roles.enum';
+import { ERoles } from 'src/enumerates/roles.enum';
 
 @Injectable()
 export class UsersService {

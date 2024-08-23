@@ -5,18 +5,31 @@ import { UsersModule } from './users/users.module';
 import { SampleLogsModule } from './sample_logs/sample_logs.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { RolesModule } from './roles/roles.module';
+import { ImagesModule } from './images/images.module';
 import configuration from './config/configuration';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from 'src/roles/roles.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ load: [configuration] }),
+    AuthModule,
     UsersModule,
     SampleLogsModule,
-    AuthModule,
-    RolesModule,
+    ImagesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

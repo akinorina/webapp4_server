@@ -12,9 +12,9 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { Public } from '../auth/decorators/public.decorator';
-import { Roles } from 'src/roles/roles.decorator';
-import { ERoles } from 'src/roles/roles.enum';
+import { Roles } from 'src/decorators/roles.decorator';
+import { ERoles } from 'src/enumerates/roles.enum';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {
