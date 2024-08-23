@@ -23,6 +23,18 @@ import { Public } from 'src/decorators/public.decorator';
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 
+  @Public()
+  @Get('public')
+  findAllPublic(@Request() req) {
+    return this.imagesService.findAll(req);
+  }
+
+  @Public()
+  @Get('public/:id')
+  findOnePublic(@Request() req, @Param('id') id: string) {
+    return this.imagesService.findOne(req, +id);
+  }
+
   @Roles([ERoles.User])
   @Post()
   create(@Request() req, @Body() createImageDto: CreateImageDto) {
@@ -40,13 +52,13 @@ export class ImagesController {
     return this.imagesService.upload(req, createImageDto, file);
   }
 
-  @Public()
+  @Roles([ERoles.User])
   @Get()
   findAll(@Request() req) {
     return this.imagesService.findAll(req);
   }
 
-  @Public()
+  @Roles([ERoles.User])
   @Get(':id')
   findOne(@Request() req, @Param('id') id: string) {
     return this.imagesService.findOne(req, +id);
