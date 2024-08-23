@@ -17,6 +17,7 @@ import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
 import { ERoles } from 'src/roles/roles.enum';
 import { Roles } from 'src/roles/roles.decorator';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('images')
 export class ImagesController {
@@ -39,7 +40,7 @@ export class ImagesController {
     return this.imagesService.upload(req, createImageDto, file);
   }
 
-  @Roles([ERoles.User])
+  @Public()
   @Get()
   findAll(@Request() req) {
     return this.imagesService.findAll(req);

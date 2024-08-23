@@ -121,28 +121,22 @@ export class ImagesService {
   }
 
   async findAll(req: any) {
-    return await this.imageRepository.find({
-      relations: {
-        user: true,
-      },
-      where: {
-        user: {
-          id: req.user.id,
-        },
-      },
-    });
+    const options: any = { relations: { user: true } };
+    if (req.user) {
+      options.where = { user: { id: req.user.id } };
+    }
+    return await this.imageRepository.find(options);
   }
 
   async findOne(req: any, id: number) {
-    return await this.imageRepository.findOneOrFail({
-      relations: {
-        user: true,
-      },
-      where: {
-        id: id,
-        user: { id: req.user.id },
-      },
-    });
+    const options: any = {
+      relations: { user: true },
+      where: { id: id },
+    };
+    if (req.user) {
+      options.where.user = { id: req.user.id };
+    }
+    return await this.imageRepository.findOneOrFail(options);
   }
 
   async update(req: any, id: number, updateImageDto: UpdateImageDto) {
