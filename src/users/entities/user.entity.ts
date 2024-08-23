@@ -37,7 +37,7 @@ export class User {
   @Column({ default: '', comment: '名かな' })
   firstnameKana: string = '';
 
-  @Column({ default: '', comment: 'メールアドレス' })
+  @Column({ default: '', comment: 'メールアドレス', unique: true })
   email: string = '';
 
   @Column({ default: '', comment: 'パスワード' })
