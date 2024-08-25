@@ -24,7 +24,7 @@ export class VerifyingEmail {
 
   @Column({
     type: 'datetime',
-    nullable: false,
+    nullable: true,
     default: null,
     comment: 'email確認済日時',
   })
