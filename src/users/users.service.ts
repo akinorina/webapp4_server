@@ -1,6 +1,8 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import * as dayjs from 'dayjs';
+import * as nunjucks from 'nunjucks';
+import { createTransport, Transporter } from 'nodemailer';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -10,10 +12,25 @@ import { User } from './entities/user.entity';
 import { VerifyingEmail } from './entities/verify-email.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { ERoles } from 'src/enumerates/roles.enum';
-import { console } from 'src/log/logger';
+import configuration from 'src/config/configuration';
+
+export interface SmtpConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  auth: {
+    user: string;
+    pass: string;
+  };
+}
+
+nunjucks.configure('views', { autoescape: true });
 
 @Injectable()
 export class UsersService {
+  smtpConfig: SmtpConfig;
+  transporter: Transporter;
+
   constructor(
     @Inject('USER_REPOSITORY')
     private userRepository: Repository<User>,
@@ -21,7 +38,10 @@ export class UsersService {
     private roleRepository: Repository<Role>,
     @Inject('VERIFYING_EMAIL_REPOSITORY')
     private verifyingEmailRepository: Repository<VerifyingEmail>,
-  ) {}
+  ) {
+    this.smtpConfig = configuration().smtp;
+    this.transporter = createTransport(this.smtpConfig);
+  }
 
   async create(createUserDto: CreateUserDto) {
     const newUser = new User();
@@ -50,7 +70,7 @@ export class UsersService {
 
   async findOneByUsername(username: string) {
     try {
-      return await this.userRepository.findOne({
+      return await this.userRepository.findOneOrFail({
         where: {
           username: username,
         },
@@ -124,22 +144,57 @@ export class UsersService {
 
     // make a URL.
     const nextURL =
-      'http://localhost:4000' +
-      '/signup-register-info?email=' +
+      configuration().app.url +
+      '/signup-register-info' +
+      '?email=' +
       encodeURI(savedData.email) +
       '&hash=' +
       encodeURIComponent(savedData.hash);
-    console.debug('nextURL', nextURL);
+
+    const options = {
+      email: savedData.email,
+      url: nextURL,
+      date: dayjs().format('YYYY-MM-DD'),
+    };
 
     // メール作成
-    //  - メールアドレス
-    //  - hash
-    //  - 次のURL
+    const toAdminText = nunjucks.render(
+      'signup/verify_email.to-admin.txt.njk',
+      options,
+    );
+    const toAdminHtml = nunjucks.render(
+      'signup/verify_email.to-admin.html.njk',
+      options,
+    );
+    // メール送信 to admin.
+    await this.transporter.sendMail({
+      from: configuration().app.system.email_address,
+      to: configuration().app.admin.email_address,
+      subject: 'Webapp4 ユーザー登録',
+      text: toAdminText,
+      html: toAdminHtml,
+    });
 
-    // メール送信
+    // メール作成
+    const touserText = nunjucks.render(
+      'signup/verify_email.to-user.txt.njk',
+      options,
+    );
+    const toUserHtml = nunjucks.render(
+      'signup/verify_email.to-user.html.njk',
+      options,
+    );
+    // メール送信 to user.
+    await this.transporter.sendMail({
+      from: configuration().app.system.email_address,
+      to: savedData.email,
+      subject: 'Webapp4 ユーザー登録',
+      text: touserText,
+      html: toUserHtml,
+    });
 
     // hash値などをレスポンス
-    return { hash: savedData.hash };
+    return { message: 'success' };
   }
 
   async registerUser(createUserDto: CreateUserDto) {
@@ -159,7 +214,7 @@ export class UsersService {
       throw new HttpException('invalid email', HttpStatus.BAD_REQUEST);
     }
 
-    // User 登録
+    // verifying email - メール確認日時 更新
     targetVerifyingEmail.verifiedEmailAt = dayjs().format(
       'YYYY-MM-DD HH:mm:ss.ssssss',
     );
@@ -179,5 +234,22 @@ export class UsersService {
     const resultUser = this.userRepository.save(user);
 
     return resultUser;
+  }
+
+  /**
+   * テストメールを送信
+   * @returns {}
+   */
+  async sendTestMail() {
+    // send a mail.
+    await this.transporter.sendMail({
+      from: '"foo" <foo@gmail.com>',
+      to: '"bar" <bar@gmail.com>',
+      subject: 'Hello ✔',
+      text: 'Hello world?',
+      html: '<b>Hello world?</b>',
+    });
+
+    return { name: 'send_test_mail', status: 'success' };
   }
 }

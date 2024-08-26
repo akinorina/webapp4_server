@@ -68,4 +68,9 @@ export class UsersController {
   registerUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.registerUser(createUserDto);
   }
+
+  @Post('send_test_mail')
+  sendTestMail() {
+    return this.usersService.sendTestMail();
+  }
 }
