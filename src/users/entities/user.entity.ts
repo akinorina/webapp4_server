@@ -12,10 +12,13 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Role } from '../../roles/entities/role.entity';
 import { Image } from '../../images/entities/image.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
+import { VerifyingEmail } from './verify-email.entity';
 
 @Entity()
 export class User {
@@ -49,6 +52,10 @@ export class User {
 
   @OneToMany(() => Image, (image) => image.user)
   images: Image[];
+
+  @OneToOne(() => VerifyingEmail)
+  @JoinColumn()
+  verifying_email: VerifyingEmail;
 
   @CreateDateColumn({ comment: '作成日時' })
   createdAt: string | undefined = undefined;
