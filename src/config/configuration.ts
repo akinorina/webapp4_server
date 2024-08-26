@@ -5,6 +5,27 @@ export default () => ({
     name: process.env.APP_NAME,
     port: parseInt(process.env.APP_PORT, 10) || 3000,
     cors: process.env.APP_CORS === 'true' || false,
+    origin: process.env.APP_ORIGIN,
+    system: {
+      name: process.env.APP_SYSTEM_NAME,
+      email: process.env.APP_SYSTEM_EMAIL,
+      email_address:
+        '"' +
+        process.env.APP_SYSTEM_NAME +
+        '" <' +
+        process.env.APP_SYSTEM_EMAIL +
+        '>',
+    },
+    admin: {
+      name: process.env.APP_ADMIN_NAME,
+      email: process.env.APP_ADMIN_EMAIL,
+      email_address:
+        '"' +
+        process.env.APP_ADMIN_NAME +
+        '" <' +
+        process.env.APP_ADMIN_EMAIL +
+        '>',
+    },
   },
   auth: {
     secret: process.env.AUTH_SECRET,
@@ -22,6 +43,18 @@ export default () => ({
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     dbname: process.env.DATABASE_DBNAME,
+  },
+  smtp: {
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT, 10) || 3306,
+    secure: process.env.SMTP_SECURE === 'true' || false,
+    auth:
+      process.env.SMTP_SECURE === 'true'
+        ? {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASSWORD,
+          }
+        : null,
   },
   storage: {
     region: process.env.STORAGE_REGION,
