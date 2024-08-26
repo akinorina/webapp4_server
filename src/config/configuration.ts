@@ -5,7 +5,7 @@ export default () => ({
     name: process.env.APP_NAME,
     port: parseInt(process.env.APP_PORT, 10) || 3000,
     cors: process.env.APP_CORS === 'true' || false,
-    url: process.env.APP_URL,
+    origin: process.env.APP_ORIGIN,
     system: {
       name: process.env.APP_SYSTEM_NAME,
       email: process.env.APP_SYSTEM_EMAIL,

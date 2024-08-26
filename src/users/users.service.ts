@@ -7,6 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { VerifyingEmailDto } from './dto/verifying-email.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Repository, Raw } from 'typeorm';
 import { User } from './entities/user.entity';
 import { VerifyingEmail } from './entities/verify-email.entity';
@@ -127,6 +128,9 @@ export class UsersService {
   }
 
   async verifyingEmail(verifyingEmailDto: VerifyingEmailDto) {
+    console.debug('--- xxx :: xxx() ---');
+    console.debug('verifyingEmailDto', verifyingEmailDto);
+
     // hash作成
     const targetValue =
       verifyingEmailDto.email + dayjs().format('YYYYMMDDHHmmss');
@@ -143,9 +147,11 @@ export class UsersService {
       await this.verifyingEmailRepository.save(verifyingEmailData);
 
     // make a URL.
+    //  - .env : APP_ORIGIN
+    //  - @Body: next_url_path
     const nextURL =
-      configuration().app.url +
-      '/signup-register-info' +
+      configuration().app.origin +
+      verifyingEmailDto.next_url_path +
       '?email=' +
       encodeURI(savedData.email) +
       '&hash=' +
@@ -194,7 +200,10 @@ export class UsersService {
     });
 
     // hash値などをレスポンス
-    return { message: 'success' };
+    return {
+      message: 'verifyingEmail() ... success',
+      hash: savedData.hash,
+    };
   }
 
   async registerUser(createUserDto: CreateUserDto) {
@@ -234,6 +243,52 @@ export class UsersService {
     const resultUser = this.userRepository.save(user);
 
     return resultUser;
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    console.debug('--- UsersService :: resetPassword() ---');
+    console.debug('resetPasswordDto', resetPasswordDto);
+
+    // verifying email から検索
+    // Email, Hash値 照合
+    const targetVerifyingEmail = await this.verifyingEmailRepository.findOne({
+      where: {
+        email: resetPasswordDto.email,
+        hash: resetPasswordDto.hash,
+        createdAt: Raw((cat) => `DATE_ADD(${cat}, INTERVAL 2 DAY) > NOW()`),
+      },
+      order: {
+        createdAt: 'DESC',
+        id: 'DESC',
+      },
+    });
+    if (!targetVerifyingEmail) {
+      throw new HttpException('invalid email', HttpStatus.BAD_REQUEST);
+    }
+    console.debug('targetVerifyingEmail', targetVerifyingEmail);
+
+    // verifying email - メール確認日時 更新
+    targetVerifyingEmail.verifiedEmailAt = dayjs().format(
+      'YYYY-MM-DD HH:mm:ss.ssssss',
+    );
+    const verifiedEmail =
+      await this.verifyingEmailRepository.save(targetVerifyingEmail);
+    console.debug(':: verifiedEmail', verifiedEmail);
+
+    // 該当ユーザー取得
+    const targetUser = await this.userRepository.findOne({
+      where: {
+        email: verifiedEmail.email,
+      },
+    });
+    console.debug('---');
+    console.debug('targetUser', targetUser);
+
+    // パスワード更新
+    targetUser.password = resetPasswordDto.password;
+    await this.userRepository.save(targetUser);
+
+    return { message: 'success' };
   }
 
   /**
