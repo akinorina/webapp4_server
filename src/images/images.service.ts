@@ -75,11 +75,7 @@ export class ImagesService {
     return await this.imageRepository.save(imageData);
   }
 
-  async upload(
-    req: any,
-    createImageDto: CreateImageDto,
-    file: Express.Multer.File,
-  ) {
+  async upload(req: any, file: Express.Multer.File) {
     // User
     const targetUser = await this.userRepository.findOneByOrFail({
       id: req.user.id,
@@ -110,13 +106,16 @@ export class ImagesService {
 
       // DBへデータ登録
       const imageData = {
-        name: createImageDto.name,
+        name: 'upload by ckeditor',
         bucket: this.bucketName,
         objectKey: objectKey,
         path: imagePath,
         user: targetUser,
       };
-      return await this.imageRepository.save(imageData);
+      const ret = await this.imageRepository.save(imageData);
+      return {
+        url: 'http://localhost:9000' + ret.path,
+      };
     }
   }
 

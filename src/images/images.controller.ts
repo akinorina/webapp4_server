@@ -43,13 +43,9 @@ export class ImagesController {
 
   @Roles([ERoles.User])
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file', { dest: 'uploads/' }))
-  upload(
-    @Request() req,
-    @Body() createImageDto: CreateImageDto,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    return this.imagesService.upload(req, createImageDto, file);
+  @UseInterceptors(FileInterceptor('upload', { dest: 'uploads/' }))
+  upload(@Request() req, @UploadedFile() upload: Express.Multer.File) {
+    return this.imagesService.upload(req, upload);
   }
 
   @Roles([ERoles.User])
