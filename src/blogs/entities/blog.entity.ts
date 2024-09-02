@@ -9,7 +9,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
 } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Blog {
@@ -21,6 +23,9 @@ export class Blog {
 
   @Column({ type: 'text', comment: '本文' })
   body: string = '';
+
+  @ManyToOne(() => User, (user) => user.blogs)
+  user: User;
 
   @CreateDateColumn({ comment: '作成日時' })
   createdAt: string | undefined = undefined;

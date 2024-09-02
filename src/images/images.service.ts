@@ -114,7 +114,7 @@ export class ImagesService {
       };
       const ret = await this.imageRepository.save(imageData);
       return {
-        url: 'http://localhost:9000' + ret.path,
+        url: configuration().storage.origin + ret.path,
       };
     }
   }
