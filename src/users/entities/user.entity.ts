@@ -17,6 +17,7 @@ import {
 } from 'typeorm';
 import { Role } from '../../roles/entities/role.entity';
 import { Image } from '../../images/entities/image.entity';
+import { Blog } from '../../blogs/entities/blog.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { VerifyingEmail } from './verify-email.entity';
 
@@ -52,6 +53,9 @@ export class User {
 
   @OneToMany(() => Image, (image) => image.user)
   images: Image[];
+
+  @OneToMany(() => Blog, (blog) => blog.user)
+  blogs: Blog[];
 
   @OneToOne(() => VerifyingEmail)
   @JoinColumn()
