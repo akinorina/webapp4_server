@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -19,6 +19,17 @@ export class GoogleAuthService {
     // search the user on DB.
     let targetUser = await this.usersService.findOneByEmail(req.user.email);
     if (!targetUser) {
+      const targetUserDeleted = await this.usersService.findOneByEmail(
+        req.user.email,
+        true,
+      );
+      if (targetUserDeleted) {
+        throw new HttpException(
+          'このアカウントでの登録はできません' + ' : ' + req.user.email,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       // create new user from google-auth data.
       const newUserDto = new CreateUserDto();
       newUserDto.username = req.user.username;

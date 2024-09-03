@@ -114,7 +114,10 @@ export class ImagesService {
       };
       const ret = await this.imageRepository.save(imageData);
       return {
-        url: configuration().storage.origin + ret.path,
+        url:
+          configuration().app.origin +
+          configuration().storage.pathPrefix +
+          ret.path,
       };
     }
   }
