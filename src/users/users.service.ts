@@ -84,9 +84,10 @@ export class UsersService {
     }
   }
 
-  async findOneByEmail(email: string) {
+  async findOneByEmail(email: string, withDeleted: boolean = false) {
     try {
       return await this.userRepository.findOne({
+        withDeleted: withDeleted,
         where: {
           email: email,
         },
@@ -128,9 +129,6 @@ export class UsersService {
   }
 
   async verifyingEmail(verifyingEmailDto: VerifyingEmailDto) {
-    console.debug('--- xxx :: xxx() ---');
-    console.debug('verifyingEmailDto', verifyingEmailDto);
-
     // hash作成
     const targetValue =
       verifyingEmailDto.email + dayjs().format('YYYYMMDDHHmmss');
@@ -246,9 +244,6 @@ export class UsersService {
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    console.debug('--- UsersService :: resetPassword() ---');
-    console.debug('resetPasswordDto', resetPasswordDto);
-
     // verifying email から検索
     // Email, Hash値 照合
     const targetVerifyingEmail = await this.verifyingEmailRepository.findOne({
@@ -265,7 +260,6 @@ export class UsersService {
     if (!targetVerifyingEmail) {
       throw new HttpException('invalid email', HttpStatus.BAD_REQUEST);
     }
-    console.debug('targetVerifyingEmail', targetVerifyingEmail);
 
     // verifying email - メール確認日時 更新
     targetVerifyingEmail.verifiedEmailAt = dayjs().format(
@@ -273,7 +267,6 @@ export class UsersService {
     );
     const verifiedEmail =
       await this.verifyingEmailRepository.save(targetVerifyingEmail);
-    console.debug(':: verifiedEmail', verifiedEmail);
 
     // 該当ユーザー取得
     const targetUser = await this.userRepository.findOne({
@@ -281,8 +274,6 @@ export class UsersService {
         email: verifiedEmail.email,
       },
     });
-    console.debug('---');
-    console.debug('targetUser', targetUser);
 
     // パスワード更新
     targetUser.password = resetPasswordDto.password;
