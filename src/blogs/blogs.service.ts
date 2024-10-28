@@ -22,6 +22,7 @@ export class BlogsService {
 
     const blogData = {
       subject: createBlogDto.subject,
+      blogAt: createBlogDto.blogAt,
       body: createBlogDto.body,
       user: targetUser,
     };
@@ -62,6 +63,7 @@ export class BlogsService {
       const updateData = {
         id: id,
         subject: updateBlogDto.subject,
+        blogAt: updateBlogDto.blogAt,
         body: updateBlogDto.body,
         user: targetUser,
       };
