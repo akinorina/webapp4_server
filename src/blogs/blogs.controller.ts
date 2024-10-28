@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Query,
   Param,
   Delete,
   Put,
@@ -13,6 +14,7 @@ import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { ERoles } from 'src/enumerates/roles.enum';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('blogs')
 export class BlogsController {
@@ -24,13 +26,13 @@ export class BlogsController {
     return this.blogsService.create(req, createBlogDto);
   }
 
-  @Roles([ERoles.User])
+  @Public()
   @Get()
-  findAll(@Request() req) {
-    return this.blogsService.findAll(req);
+  findAll(@Request() req, @Query() options) {
+    return this.blogsService.findAll(req, options);
   }
 
-  @Roles([ERoles.User])
+  @Public()
   @Get(':id')
   findOne(@Request() req, @Param('id') id: string) {
     return this.blogsService.findOne(req, +id);
