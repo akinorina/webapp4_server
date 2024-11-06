@@ -21,6 +21,14 @@ export class Blog {
   @Column({ default: '', comment: '主題' })
   subject: string = '';
 
+  @Column({
+    type: 'datetime',
+    nullable: true,
+    default: null,
+    comment: 'blog表示日時',
+  })
+  blogAt: string | undefined = undefined;
+
   @Column({ type: 'text', comment: '本文' })
   body: string = '';
 

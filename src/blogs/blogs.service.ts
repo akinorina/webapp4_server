@@ -1,5 +1,5 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { Blog } from './entities/blog.entity';
@@ -22,22 +22,54 @@ export class BlogsService {
 
     const blogData = {
       subject: createBlogDto.subject,
+      blogAt: createBlogDto.blogAt,
       body: createBlogDto.body,
       user: targetUser,
     };
     return this.blogRepository.save(blogData);
   }
 
-  async findAll(req: any) {
-    const options: any = { relations: { user: true } };
+  async findAll(req: any, queries: any) {
+    const options: any = {
+      relations: { user: true },
+      where: { body: null, user: null },
+      order: {},
+    };
+
+    // conditions
+    if (queries.q) {
+      options.where = { body: Like('%' + queries.q + '%') };
+    }
     if (req.user) {
       options.where = { user: { id: req.user.id } };
     }
+    // order by
+    if (queries.orders) {
+      const ords = queries.orders.split(',');
+      ords.forEach((ordItem) => {
+        const ord = ordItem.split(':');
+        options.order[ord[0]] = ord[1];
+      });
+    }
+
     return await this.blogRepository.find(options);
   }
 
   async findOne(req: any, id: number) {
     try {
+      // prev_id & next_id
+      const queries = { orders: 'desc' };
+      const blogList = await this.findAll(req, queries);
+      const aryList = blogList.map((item) => {
+        return item.id;
+      });
+      const maxIndex = aryList.length - 1;
+      const targetIndex = aryList.findIndex((item) => {
+        return item === id;
+      });
+      const prevId = targetIndex <= 0 ? -1 : aryList[targetIndex - 1];
+      const nextId = targetIndex >= maxIndex ? -1 : aryList[targetIndex + 1];
+
       const options: any = {
         relations: { user: true },
         where: { id: id },
@@ -45,7 +77,10 @@ export class BlogsService {
       if (req.user) {
         options.where.user = { id: req.user.id };
       }
-      return await this.blogRepository.findOneOrFail(options);
+      const targetBlog: any = await this.blogRepository.findOneOrFail(options);
+      targetBlog.prevId = prevId;
+      targetBlog.nextId = nextId;
+      return targetBlog;
     } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
@@ -62,6 +97,7 @@ export class BlogsService {
       const updateData = {
         id: id,
         subject: updateBlogDto.subject,
+        blogAt: updateBlogDto.blogAt,
         body: updateBlogDto.body,
         user: targetUser,
       };
