@@ -47,6 +47,9 @@ export class User {
   @Column({ default: '', comment: 'パスワード' })
   password: string = '';
 
+  @Column({ default: 0, comment: '利用規約への同意' })
+  agreeTerms: boolean = false;
+
   @ManyToMany(() => Role)
   @JoinTable()
   roles: Role[];
@@ -78,5 +81,6 @@ export class User {
     this.familynameKana = createUserDto.familynameKana;
     this.email = createUserDto.email;
     this.password = createUserDto.password;
+    this.agreeTerms = createUserDto.agreeTerms === '1';
   }
 }
