@@ -55,4 +55,5 @@ export default {
       level: 'ALL',
     },
   },
+  pm2: true,
 };
