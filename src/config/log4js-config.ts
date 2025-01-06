@@ -56,4 +56,5 @@ export default {
     },
   },
   pm2: true,
+  pm2InstanceVar: 'WEBAPP4_SERVER_ID',
 };
