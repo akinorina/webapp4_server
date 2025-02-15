@@ -41,6 +41,8 @@ export class GoogleAuthService {
       newUserDto.firstname = req.user.firstname;
       newUserDto.email = req.user.email;
       newUserDto.password = '';
+      newUserDto.accountType = 'google';
+      newUserDto.agreeTerms = '0';
       targetUser = await this.usersService.create(newUserDto);
     }
 

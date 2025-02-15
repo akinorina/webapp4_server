@@ -47,6 +47,9 @@ export class User {
   @Column({ default: '', comment: 'パスワード' })
   password: string = '';
 
+  @Column({ default: 'normal', comment: 'アカウントタイプ (normal|google)' })
+  accountType: 'normal' | 'google' = 'normal';
+
   @Column({ default: 0, comment: '利用規約への同意' })
   agreeTerms: boolean = false;
 
@@ -81,6 +84,7 @@ export class User {
     this.familynameKana = createUserDto.familynameKana;
     this.email = createUserDto.email;
     this.password = createUserDto.password;
+    this.accountType = createUserDto.accountType;
     this.agreeTerms = createUserDto.agreeTerms === '1';
   }
 }

@@ -30,5 +30,8 @@ export class CreateUserDto {
   password: string;
 
   @IsNotEmpty()
+  accountType: 'normal' | 'google';
+
+  @IsNotEmpty()
   agreeTerms: string;
 }
