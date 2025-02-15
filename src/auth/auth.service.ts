@@ -34,6 +34,21 @@ export class AuthService {
     };
   }
 
+  async resignIn(user: any) {
+    const roles = user.roles.map((item) => {
+      return item.name;
+    });
+    const payload = {
+      username: user.username,
+      email: user.email,
+      sub: user.id,
+      roles: roles,
+    };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
   async signOut() {
     return { access_token: null };
   }
