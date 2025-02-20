@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  HttpException,
-  HttpStatus,
-  CanActivate,
-} from '@nestjs/common';
+import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import * as dayjs from 'dayjs';
 import * as nunjucks from 'nunjucks';
