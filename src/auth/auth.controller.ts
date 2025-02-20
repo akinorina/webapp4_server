@@ -14,6 +14,12 @@ export class AuthController {
     return this.authService.signIn(req.user);
   }
 
+  @UseGuards(LocalAuthGuard)
+  @Post('resignin')
+  async resignIn(@Request() req: any) {
+    return this.authService.resignIn(req.user);
+  }
+
   @Public()
   @Post('signout')
   async signOut() {

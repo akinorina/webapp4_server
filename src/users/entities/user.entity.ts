@@ -20,6 +20,7 @@ import { Image } from '../../images/entities/image.entity';
 import { Blog } from '../../blogs/entities/blog.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { VerifyingEmail } from './verify-email.entity';
+import { RegisterUserNormalDto } from '../dto/register-user-normal.dto';
 
 @Entity()
 export class User {
@@ -47,6 +48,9 @@ export class User {
   @Column({ default: '', comment: 'パスワード' })
   password: string = '';
 
+  @Column({ default: 'normal', comment: 'アカウントタイプ (normal|google)' })
+  accountType: AccountType = 'normal';
+
   @Column({ default: 0, comment: '利用規約への同意' })
   agreeTerms: boolean = false;
 
@@ -73,14 +77,27 @@ export class User {
   @DeleteDateColumn({ comment: '削除日時' })
   deletedAt: string | undefined = undefined;
 
-  setValueByCreateUserDto(createUserDto: CreateUserDto) {
-    this.username = createUserDto.username;
-    this.firstname = createUserDto.firstname;
-    this.familyname = createUserDto.familyname;
-    this.firstnameKana = createUserDto.firstnameKana;
-    this.familynameKana = createUserDto.familynameKana;
-    this.email = createUserDto.email;
-    this.password = createUserDto.password;
-    this.agreeTerms = createUserDto.agreeTerms === '1';
+  setValueByCreateUserDto(userDto: CreateUserDto) {
+    this.username = userDto.username;
+    this.firstname = userDto.firstname;
+    this.familyname = userDto.familyname;
+    this.firstnameKana = userDto.firstnameKana;
+    this.familynameKana = userDto.familynameKana;
+    this.email = userDto.email;
+    this.password = userDto.password;
+    this.accountType = userDto.accountType;
+    this.agreeTerms = userDto.agreeTerms === '1';
+  }
+
+  setValueByRegisterUserNormalDto(userDto: RegisterUserNormalDto) {
+    this.username = userDto.username;
+    this.firstname = userDto.firstname;
+    this.familyname = userDto.familyname;
+    this.firstnameKana = userDto.firstnameKana;
+    this.familynameKana = userDto.familynameKana;
+    this.email = userDto.email;
+    this.password = userDto.password;
+    this.accountType = userDto.accountType;
+    this.agreeTerms = userDto.agreeTerms === '1';
   }
 }

@@ -17,6 +17,7 @@ export class GoogleAuthController {
   @Get('signin-google-redirect')
   @UseGuards(GoogleOAuthGuard)
   async googleAuthRedirect(@Request() req, @Res() res) {
+    // Google OAuth 成功
     try {
       const access_token = await this.authService.signInGoogle(req);
       const toUrl = '/signin-google-redirect?access_token=' + access_token;

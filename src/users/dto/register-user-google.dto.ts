@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsEmail, Length } from 'class-validator';
 
-export class CreateUserDto {
+export class RegisterUserGoogleDto {
   @IsNotEmpty()
   @Length(1, 200)
   username: string;

@@ -6,7 +6,10 @@ export class VerifyingEmailDto {
   @Length(1, 250)
   email: string;
 
+  // emailアドレス確認後のアクション
+  // 'sign-up'       : ユーザー登録時
+  // 'reset-password': パスワードリセット時
   @IsNotEmpty()
   @Length(1, 250)
-  next_url_path: string;
+  action: 'sign-up' | 'reset-password';
 }
