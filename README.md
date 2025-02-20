@@ -93,9 +93,9 @@ webapp4 はWebアプリのテンプレートですが、基本的な部分が動
 | サイン-イン       | /signin-google-redirect            |
 | サイン-アウト     | /signout                           |
 | サイン-アップ     | /signup                            |
-| サイン-アップ     | /signup/signup-sent-email          |
-| サイン-アップ     | /signup/signup-input       |
-| サイン-アップ     | /signup/signup-completion          |
+| サイン-アップ     | /signup-sent-email          |
+| サイン-アップ     | /signup-input       |
+| サイン-アップ     | /signup-completion          |
 | パスワードリセット | /reset-password                    |
 | パスワードリセット | /reset-password-sent-email         |
 | パスワードリセット | /reset-password-input              |
