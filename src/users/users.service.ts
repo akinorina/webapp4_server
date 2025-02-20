@@ -1,4 +1,10 @@
-import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  HttpException,
+  HttpStatus,
+  CanActivate,
+} from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import * as dayjs from 'dayjs';
 import * as nunjucks from 'nunjucks';
@@ -9,6 +15,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { VerifyingEmailDto } from './dto/verifying-email.dto';
 import { CheckVerifyingEmailDto } from './dto/check-verifying-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { RegisterUserNormalDto } from './dto/register-user-normal.dto';
 import { Repository, Raw, IsNull } from 'typeorm';
 import { User } from './entities/user.entity';
 import { VerifyingEmail } from './entities/verify-email.entity';
@@ -45,6 +52,7 @@ export class UsersService {
     this.transporter = createTransport(this.smtpConfig);
   }
 
+  // ユーザー作成
   async create(createUserDto: CreateUserDto) {
     const newUser = new User();
     newUser.setValueByCreateUserDto(createUserDto);
@@ -116,6 +124,7 @@ export class UsersService {
     return await this.userRepository.softDelete(id);
   }
 
+  // パスワード更新
   async changePassword(user: any, changePasswordDto: ChangePasswordDto) {
     // find the target User data.
     const targetUser = await this.userRepository.findOne({
@@ -136,7 +145,34 @@ export class UsersService {
     return await this.userRepository.update(user.id, targetUser);
   }
 
-  async verifyingEmail(verifyingEmailDto: VerifyingEmailDto) {
+  // verify-email - 確認メール送信
+  async sendVerifyingEmail(verifyingEmailDto: VerifyingEmailDto) {
+    // data
+    const sendVerifyingEmailData = {
+      'sign-up': {
+        next_url_path: '/signup-input',
+        email_title: 'Webapp4 ユーザー登録',
+        path_verifyemail_admin_text: 'sign-up/verify_email.to-admin.text.njk',
+        path_verifyemail_admin_html: 'sign-up/verify_email.to-admin.html.njk',
+        path_verifyemail_user_text: 'sign-up/verify_email.to-user.text.njk',
+        path_verifyemail_user_html: 'sign-up/verify_email.to-user.html.njk',
+      },
+      'reset-password': {
+        next_url_path: '/reset-password-input',
+        email_title: 'Webapp4 パスワード初期化',
+        path_verifyemail_admin_text:
+          'reset-password/verify_email.to-admin.text.njk',
+        path_verifyemail_admin_html:
+          'reset-password/verify_email.to-admin.html.njk',
+        path_verifyemail_user_text:
+          'reset-password/verify_email.to-user.text.njk',
+        path_verifyemail_user_html:
+          'reset-password/verify_email.to-user.html.njk',
+      },
+    };
+    // action
+    const action = verifyingEmailDto.action;
+
     // hash作成
     const targetValue =
       verifyingEmailDto.email + dayjs().format('YYYYMMDDHHmmss');
@@ -155,9 +191,10 @@ export class UsersService {
     // make a URL.
     //  - .env : APP_ORIGIN
     //  - @Body: next_url_path
+    //
     const nextURL =
       configuration().app.origin +
-      verifyingEmailDto.next_url_path +
+      sendVerifyingEmailData[action].next_url_path +
       '?email=' +
       encodeURI(savedData.email) +
       '&hash=' +
@@ -171,47 +208,48 @@ export class UsersService {
 
     // メール作成
     const toAdminText = nunjucks.render(
-      'signup/verify_email.to-admin.txt.njk',
+      sendVerifyingEmailData[action].path_verifyemail_admin_text,
       options,
     );
     const toAdminHtml = nunjucks.render(
-      'signup/verify_email.to-admin.html.njk',
+      sendVerifyingEmailData[action].path_verifyemail_admin_html,
       options,
     );
     // メール送信 to admin.
     await this.transporter.sendMail({
       from: configuration().app.system.email_address,
       to: configuration().app.admin.email_address,
-      subject: 'Webapp4 ユーザー登録',
+      subject: sendVerifyingEmailData[action].email_title,
       text: toAdminText,
       html: toAdminHtml,
     });
 
     // メール作成
     const touserText = nunjucks.render(
-      'signup/verify_email.to-user.txt.njk',
+      sendVerifyingEmailData[action].path_verifyemail_user_text,
       options,
     );
     const toUserHtml = nunjucks.render(
-      'signup/verify_email.to-user.html.njk',
+      sendVerifyingEmailData[action].path_verifyemail_user_html,
       options,
     );
     // メール送信 to user.
     await this.transporter.sendMail({
       from: configuration().app.system.email_address,
       to: savedData.email,
-      subject: 'Webapp4 ユーザー登録',
+      subject: sendVerifyingEmailData[action].email_title,
       text: touserText,
       html: toUserHtml,
     });
 
     // hash値などをレスポンス
     return {
-      message: 'verifyingEmail() ... success',
+      message: 'sendVerifyingEmail() ... success',
       hash: savedData.hash,
     };
   }
 
+  // verify-email - メールアドレス検証
   async checkVerifyingEmail(checkVerifyingEmailDto: CheckVerifyingEmailDto) {
     // check verifying email.
     try {
@@ -230,18 +268,19 @@ export class UsersService {
         },
       });
     } catch (error) {
-      throw new HttpException('invalid email', HttpStatus.BAD_REQUEST);
+      throw new HttpException('invalid email-address.', HttpStatus.BAD_REQUEST);
     }
 
     return { result: 'valid' };
   }
 
-  async registerUser(createUserDto: CreateUserDto) {
+  // Sign-up - ユーザー新規登録
+  async registerUser(registerUserNormalDto: RegisterUserNormalDto) {
     // Email, Hash値 照合
     const targetVerifyingEmail = await this.verifyingEmailRepository.findOne({
       where: {
-        email: createUserDto.email,
-        hash: createUserDto.email_hash,
+        email: registerUserNormalDto.email,
+        hash: registerUserNormalDto.email_hash,
         createdAt: Raw(
           (cat) => `DATE_ADD(${cat}, INTERVAL 120 MINUTE) > NOW()`,
         ),
@@ -270,7 +309,7 @@ export class UsersService {
 
     // User 登録
     const user = new User();
-    user.setValueByCreateUserDto(createUserDto);
+    user.setValueByRegisterUserNormalDto(registerUserNormalDto);
     user.verifying_email = verifiedEmail;
     user.roles = [role];
     const resultUser = this.userRepository.save(user);
@@ -278,6 +317,7 @@ export class UsersService {
     return resultUser;
   }
 
+  // reset-password - パスワード更新 処理
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     // verifying email から検索
     // Email, Hash値 照合

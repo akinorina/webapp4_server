@@ -94,7 +94,7 @@ webapp4 はWebアプリのテンプレートですが、基本的な部分が動
 | サイン-アウト     | /signout                           |
 | サイン-アップ     | /signup                            |
 | サイン-アップ     | /signup/signup-sent-email          |
-| サイン-アップ     | /signup/signup-register-info       |
+| サイン-アップ     | /signup/signup-input       |
 | サイン-アップ     | /signup/signup-completion          |
 | パスワードリセット | /reset-password                    |
 | パスワードリセット | /reset-password-sent-email         |
@@ -140,10 +140,10 @@ webapp4 はWebアプリのテンプレートですが、基本的な部分が動
 | ユーザー管理 - 更新       | PUT | /api/users/:id |
 | ユーザー管理 - 削除       | DELETE | /api/users/:id |
 | ユーザー管理 - パスワード変更 | PUT | /api/users/change-password |
-| ユーザー管理 - xxxxxxxxxxxx | POST | /api/users/verifing-email  |
-| ユーザー管理 - xxxxxxxxxxxx | POST | /api/users/check_verifying_email  |
-| ユーザー管理 - xxxxxxxxxxxx | POST | /api/users/register-user  |
-| ユーザー管理 - xxxxxxxxxxxx | POST | /api/users/reset-password  |
+| ユーザー管理 - verify-email - 確認メール送信 | POST | /api/users/send-verifying-email  |
+| ユーザー管理 - verify-email - メールアドレス検証 | POST | /api/users/check-verifying-email  |
+| ユーザー管理 - ユーザー情報登録 | POST | /api/users/register-user  |
+| ユーザー管理 - パスワードリセット | POST | /api/users/reset-password  |
 | ユーザー管理 for TEST | POST | /api/users/send_test_mail  |
 | ログ出力サンプル - 例                 | GET | /api/sample_logs  |
 | ログ出力サンプル - 例 - fatal         | GET | /api/sample_logs/fatal  |

@@ -15,6 +15,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { VerifyingEmailDto } from './dto/verifying-email.dto';
 import { CheckVerifyingEmailDto } from './dto/check-verifying-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { RegisterUserNormalDto } from './dto/register-user-normal.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { ERoles } from 'src/enumerates/roles.enum';
 import { Public } from 'src/decorators/public.decorator';
@@ -23,69 +24,129 @@ import { Public } from 'src/decorators/public.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  /**
+   * ユーザー作成
+   * @param createUserDto ユーザー情報
+   * @returns APIレスポンス
+   */
   @Public()
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.create(createUserDto);
   }
 
+  /**
+   * ユーザー一覧
+   * @returns ユーザー一覧
+   */
   @Roles([ERoles.Admin])
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    return await this.usersService.findAll();
   }
 
+  /**
+   * ユーザー情報 取得
+   * @param id ユーザーID
+   * @returns ユーザー情報
+   */
   @Roles([ERoles.Admin])
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.usersService.findOne(+id);
   }
 
-  @Roles([ERoles.Admin, ERoles.User])
-  @Put('change-password')
-  changePassword(@Request() req, @Body() changePasswordDto: ChangePasswordDto) {
-    return this.usersService.changePassword(req.user, changePasswordDto);
-  }
-
+  /**
+   * ユーザー情報 更新
+   * @param id ユーザーID
+   * @param updateUserDto
+   * @returns APIレスポンス
+   */
   @Roles([ERoles.Admin])
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return await this.usersService.update(+id, updateUserDto);
   }
 
+  /**
+   * ユーザー情報 削除
+   * @param id ユーザーID
+   * @returns APIレスポンス
+   */
   @Roles([ERoles.Admin])
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.usersService.remove(+id);
   }
 
+  /**
+   * パスワード変更
+   * @param req リクエストデータ
+   * @param changePasswordDto パスワード情報
+   * @returns APIレスポンス
+   */
+  @Roles([ERoles.Admin, ERoles.User])
+  @Put('change-password')
+  async changePassword(
+    @Request() req,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return await this.usersService.changePassword(req.user, changePasswordDto);
+  }
+
+  /**
+   * メール確認
+   * @param verifyingEmailDto
+   * @returns APIレスポンス
+   */
   @Public()
-  @Post('verifing-email')
-  verifyingEmail(@Body() verifyingEmailDto: VerifyingEmailDto) {
-    return this.usersService.verifyingEmail(verifyingEmailDto);
+  @Post('send-verifying-email')
+  async sendVerifyingEmail(@Body() verifyingEmailDto: VerifyingEmailDto) {
+    return await this.usersService.sendVerifyingEmail(verifyingEmailDto);
   }
 
+  /**
+   * メール確認
+   * @param checkVerifyingEmailDto
+   * @returns APIレスポンス
+   */
   @Public()
-  @Post('check_verifying_email')
-  checkVerifyingEmail(@Body() checkVerifyingEmailDto: CheckVerifyingEmailDto) {
-    return this.usersService.checkVerifyingEmail(checkVerifyingEmailDto);
+  @Post('check-verifying-email')
+  async checkVerifyingEmail(
+    @Body() checkVerifyingEmailDto: CheckVerifyingEmailDto,
+  ) {
+    return await this.usersService.checkVerifyingEmail(checkVerifyingEmailDto);
   }
 
+  /**
+   * ユーザー登録
+   * @param createUserDto
+   * @returns APIレスポンス
+   */
   @Public()
   @Post('register-user')
-  registerUser(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.registerUser(createUserDto);
+  async registerUser(@Body() registerUserNormalDto: RegisterUserNormalDto) {
+    return await this.usersService.registerUser(registerUserNormalDto);
   }
 
+  /**
+   * パスワードリセット
+   * @param resetPasswordDto
+   * @returns APIレスポンス
+   */
   @Public()
   @Post('reset-password')
-  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.usersService.resetPassword(resetPasswordDto);
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return await this.usersService.resetPassword(resetPasswordDto);
   }
 
+  /**
+   * メール送信テスト
+   * @returns APIレスポンス { name: 'send_test_mail', status: 'success'}
+   */
   @Public()
   @Post('send_test_mail')
-  sendTestMail() {
-    return this.usersService.sendTestMail();
+  async sendTestMail() {
+    return await this.usersService.sendTestMail();
   }
 }
