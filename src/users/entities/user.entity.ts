@@ -21,6 +21,7 @@ import { Blog } from '../../blogs/entities/blog.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { VerifyingEmail } from './verify-email.entity';
 import { RegisterUserNormalDto } from '../dto/register-user-normal.dto';
+import { AccountType } from 'src';
 
 @Entity()
 export class User {
