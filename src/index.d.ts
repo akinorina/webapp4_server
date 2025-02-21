@@ -1,4 +1,4 @@
 // index.d.ts
 
 // アカウントタイプ
-type AccountType = 'by_admin' | 'normal' | 'google';
+export type AccountType = 'by_admin' | 'normal' | 'google';
