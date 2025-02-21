@@ -1,4 +1,4 @@
-# webapp4_client
+# webapp4_server
 
 ## 1. 概要
 webapp4 は仲田明紀個人事業で開発している、Webアプリのテンプレートです。
