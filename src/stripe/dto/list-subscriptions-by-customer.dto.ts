@@ -1,3 +1,4 @@
 export class ListSubscriptionsByCustomerDto {
-  customerId: string;
+  customerId: string = '';
+  status?: string = undefined;
 }

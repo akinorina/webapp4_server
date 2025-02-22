@@ -112,6 +112,7 @@ export class StripeService {
   ) {
     const subscriptions = await this.stripe.subscriptions.list({
       customer: listSubscriptionsByCustomerDto.customerId,
+      status: listSubscriptionsByCustomerDto.status,
       expand: ['data.latest_invoice.payment_intent'],
     } as Stripe.SubscriptionListParams);
 
@@ -178,8 +179,15 @@ export class StripeService {
 
   // Subscription キャンセル処理
   async cancelSubscription(subscriptionId: string) {
-    await this.stripe.subscriptions.cancel(subscriptionId);
-    return {};
+    // このメソッド実行時に直ちにキャンセル実行する場合
+    // const res = await this.stripe.subscriptions.cancel(subscriptionId);
+    // return res;
+
+    // このメソッド実行時ではなく、サービス期間終了時にキャンセルする場合
+    const res = await this.stripe.subscriptions.update(subscriptionId, {
+      cancel_at_period_end: true,
+    });
+    return res;
   }
 
   // PaymentMethod 一覧
