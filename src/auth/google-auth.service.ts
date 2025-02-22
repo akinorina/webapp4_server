@@ -52,6 +52,7 @@ export class GoogleAuthService {
     });
     const payload = {
       username: targetUser.username,
+      email: targetUser.email,
       sub: targetUser.id,
       roles: roles,
     };

@@ -323,6 +323,27 @@ https://www.example.com
 docker compose -f docker-compose.yml -f docker-compose-cs.yml down
 ```
 
+## 4. Stripe によるサブスクリプション決済機能
+サブスクリプションサービスを提供する場合、その決済を Stripe (https://www.stripe.com) を用いる場合の実装例をサンプルに用意している。
+webapp4_server に必要なAPI（試作）も実装している。
+
+### 4-1. 準備
+.env に必要な設定を行う。次の２つの値は Stripe のダッシュボードで取得できる。
+ - STRIPE 公開可能キー
+ - STRIPE シークレットキー
+
+### 4-2. 商品データを Stripe へ登録
+次のコマンドを実行して、商品データ、価格データを Stripe のデータベースに登録する。
+```
+stripe fixtures seed_products.json
+```
+
+### 4-3. 商品に機能を関連付ける
+4-2で作成した商品に、機能を作成して、関連付けを行う。
+
+### 4-xx. xxx
+
+
 # Appendix
 
 ## Appendix 1. Webアプリのページ構成
