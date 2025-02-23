@@ -35,4 +35,6 @@ export class RegisterUserGoogleDto {
 
   @IsNotEmpty()
   agreeTerms: string;
+
+  stripeCustomerId: string;
 }

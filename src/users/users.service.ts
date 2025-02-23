@@ -104,7 +104,15 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    return await this.userRepository.update(id, updateUserDto);
+    const targetUser = new User();
+    targetUser.setValueByUpdateUserDto(updateUserDto);
+    return await this.userRepository.update(id, targetUser);
+  }
+
+  async updatePatch(id: number, updateUserDto: UpdateUserDto) {
+    const targetUser = await this.findOne(id);
+    targetUser.setValueByUpdateUserDto(updateUserDto);
+    return await this.userRepository.update(id, targetUser);
   }
 
   async remove(id: number) {
