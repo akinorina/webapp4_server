@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "template_version": 0
+  },
+  "fixtures": [
+    {
+      "name": "meeting_light_product",
+      "path": "/v1/products",
+      "method": "post",
+      "params": {
+        "name": "bc-meeting light"
+      }
+    },
+    {
+      "name": "meeting_light_price",
+      "path": "/v1/prices",
+      "method": "post",
+      "params": {
+        "product": "${meeting_light_product:id}",
+        "lookup_key": "meeting",
+        "currency": "jpy",
+        "unit_amount": 550,
+        "recurring": {
+          "interval": "month"
+        },
+        "metadata": {
+          "sample": "fixed-price"
+        }
+      }
+    }
+  ]
+}
