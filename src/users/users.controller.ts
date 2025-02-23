@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   Request,
+  Patch,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -86,7 +87,7 @@ export class UsersController {
    * @returns APIレスポンス
    */
   @Roles([ERoles.Admin, ERoles.User])
-  @Put('change-password')
+  @Patch('change-password')
   async changePassword(
     @Request() req,
     @Body() changePasswordDto: ChangePasswordDto,
