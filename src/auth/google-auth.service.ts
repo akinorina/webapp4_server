@@ -29,7 +29,7 @@ export class GoogleAuthService {
       if (targetUserDeleted) {
         // 一度不正で削除処理したユーザーの場合
         throw new HttpException(
-          'このアカウントでの登録はできません' + ' : ' + req.user.email,
+          'このメールアドレスでの登録はできません' + ' : ' + req.user.email,
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -51,6 +51,7 @@ export class GoogleAuthService {
       return item.name;
     });
     const payload = {
+      id: targetUser.id,
       username: targetUser.username,
       email: targetUser.email,
       sub: targetUser.id,
