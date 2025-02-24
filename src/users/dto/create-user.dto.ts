@@ -35,4 +35,6 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   agreeTerms: string;
+
+  stripeCustomerId: string;
 }

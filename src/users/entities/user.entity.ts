@@ -19,6 +19,7 @@ import { Role } from '../../roles/entities/role.entity';
 import { Image } from '../../images/entities/image.entity';
 import { Blog } from '../../blogs/entities/blog.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 import { VerifyingEmail } from './verify-email.entity';
 import { RegisterUserNormalDto } from '../dto/register-user-normal.dto';
 import { AccountType } from 'src';
@@ -55,6 +56,9 @@ export class User {
   @Column({ default: 0, comment: '利用規約への同意' })
   agreeTerms: boolean = false;
 
+  @Column({ default: '', comment: 'Stripe Customer Id' })
+  stripeCustomerId: string = '';
+
   @ManyToMany(() => Role)
   @JoinTable()
   roles: Role[];
@@ -88,6 +92,22 @@ export class User {
     this.password = userDto.password;
     this.accountType = userDto.accountType;
     this.agreeTerms = userDto.agreeTerms === '1';
+    this.stripeCustomerId = userDto.stripeCustomerId;
+  }
+
+  setValueByUpdateUserDto(userDto: UpdateUserDto) {
+    this.username = userDto.username ?? this.username;
+    this.firstname = userDto.firstname ?? this.firstname;
+    this.familyname = userDto.familyname ?? this.familyname;
+    this.firstnameKana = userDto.firstnameKana ?? this.firstnameKana;
+    this.familynameKana = userDto.familynameKana ?? this.familynameKana;
+    this.email = userDto.email ?? this.email;
+
+    this.accountType = userDto.accountType ?? this.accountType;
+    this.agreeTerms = userDto.agreeTerms
+      ? userDto.agreeTerms === '1'
+      : this.agreeTerms;
+    this.stripeCustomerId = userDto.stripeCustomerId ?? this.stripeCustomerId;
   }
 
   setValueByRegisterUserNormalDto(userDto: RegisterUserNormalDto) {
@@ -100,5 +120,6 @@ export class User {
     this.password = userDto.password;
     this.accountType = userDto.accountType;
     this.agreeTerms = userDto.agreeTerms === '1';
+    this.stripeCustomerId = userDto.stripeCustomerId;
   }
 }

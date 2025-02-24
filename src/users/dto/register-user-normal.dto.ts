@@ -37,4 +37,6 @@ export class RegisterUserNormalDto {
 
   @IsNotEmpty()
   agreeTerms: string;
+
+  stripeCustomerId: string;
 }

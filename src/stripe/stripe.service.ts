@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateStripeDto } from './dto/create-stripe.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -13,6 +13,8 @@ import { CreateSetupIntentByCustomerDto } from './dto/create-setup-intent-by-cus
 import { application } from '../log/logger';
 import Stripe from 'stripe';
 import configuration from 'src/config/configuration';
+import { Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class StripeService {
@@ -20,7 +22,10 @@ export class StripeService {
   private stripe: Stripe;
   private calculateTax = true;
 
-  constructor() {
+  constructor(
+    @Inject('USER_REPOSITORY')
+    private userRepository: Repository<User>,
+  ) {
     this.stripe = new Stripe(configuration().stripe.secret_key);
   }
 
@@ -87,7 +92,19 @@ export class StripeService {
       tax: {
         validate_location: 'immediately',
       },
+      metadata: {
+        userId: createCustomerDto.id,
+      },
     })) as Stripe.Response<Stripe.Customer>;
+
+    // target user
+    const targetUser = await this.userRepository.findOneOrFail({
+      where: { email: createCustomerDto.email },
+    });
+
+    // stripe_customer_id を設定
+    targetUser.stripeCustomerId = customer.id;
+    await this.userRepository.update(targetUser.id, targetUser);
 
     return { customer: customer };
   }

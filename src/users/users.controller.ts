@@ -70,6 +70,22 @@ export class UsersController {
   }
 
   /**
+   * ユーザー情報 更新
+   * @param id ユーザーID
+   * @param updateUserDto
+   * @returns APIレスポンス
+   */
+  // @Roles([ERoles.Admin])
+  @Public()
+  @Patch(':id')
+  async updatePatch(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return await this.usersService.updatePatch(+id, updateUserDto);
+  }
+
+  /**
    * ユーザー情報 削除
    * @param id ユーザーID
    * @returns APIレスポンス
